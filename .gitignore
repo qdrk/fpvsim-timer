@@ -1,0 +1,7 @@
+.tmp
+.pio
+.vscode
+.pioenvs
+.piolibdeps
+app/drrace/platforms
+.history

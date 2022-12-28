@@ -32,8 +32,8 @@ void updateRssiTrigger() {
 
 char apSsid[11];
 void setApSsid() {
-  strcpy(apSsid, "quadrank- \0");
-  apSsid[9] = char('a' + settings.id);
+  strcpy(apSsid, "fpvsim- \0");
+  apSsid[7] = char('a' + settings.id);
 }
 
 void setupServer() {
@@ -56,8 +56,10 @@ void setupServer() {
       counter += 1;
       delay(100);
       Serial.print(".");
-      if (counter > 150) {
+      if (counter > 70) {
         Serial.println("Failed to connect to router. Skipping.");
+        // This seems to improve network stability when WIFI failed.
+        WiFi.mode(WIFI_AP);
         break;
       }
     }

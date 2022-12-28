@@ -13,11 +13,18 @@
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
 
+// Reconnect timestamp millis.
+unsigned long previousReconnectMillis = 0;
+// Reconnection interval.
+unsigned long reconnectInterval = 1000 * 5;
+// Used to bookkeep whether connected to router.
+bool isWifiConnected = false;
+// SSID for AP mode.
+char apSsid[11];
 
 const int slaveSelectPin = SS; // Setup data pins for rx5808 comms
 const int spiDataPin = MOSI;
 const int spiClockPin = SCK;
-
 
 // #define DEV_MODE
 
@@ -232,3 +239,15 @@ void setRxModule(int frequency) {
 
 // Read the RSSI value for the current channel
 int rssiRead() { return analogRead(RSSI_PIN); }
+
+void printWifiInfo() {
+  Serial.print("IP address for network ");
+  Serial.print(settings.routerSsid);
+  Serial.print(" : ");
+  Serial.println(WiFi.localIP());
+  Serial.print("IP address for network ");
+  Serial.print(apSsid);
+  Serial.print(" : ");
+  Serial.print(WiFi.softAPIP());
+  Serial.println("");
+}

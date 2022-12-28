@@ -30,7 +30,6 @@ void updateRssiTrigger() {
   settingsUpdated = true;
 }
 
-char apSsid[11];
 void setApSsid() {
   strcpy(apSsid, "fpvsim- \0");
   apSsid[7] = char('a' + settings.id);
@@ -48,6 +47,7 @@ void setupServer() {
     WiFi.begin(settings.routerSsid, settings.routerPwd);
 
     // Connecting to WiFi...
+    previousReconnectMillis = millis();
     Serial.print("Connecting to ");
     Serial.print(settings.routerSsid);
     int counter = 0;
@@ -59,7 +59,7 @@ void setupServer() {
       if (counter > 70) {
         Serial.println("Failed to connect to router. Skipping.");
         // This seems to improve network stability when WIFI failed.
-        WiFi.mode(WIFI_AP);
+        WiFi.disconnect();
         break;
       }
     }
@@ -68,15 +68,7 @@ void setupServer() {
   // Connected to WiFi
   Serial.println();
   Serial.println("Connected!");
-  Serial.print("IP address for network ");
-  Serial.print(settings.routerSsid);
-  Serial.print(" : ");
-  Serial.println(WiFi.localIP());
-  Serial.print("IP address for network ");
-  Serial.print(apSsid);
-  Serial.print(" : ");
-  Serial.print(WiFi.softAPIP());
-  Serial.println("");
+  printWifiInfo();
 
   // Dump network settings.
   strcpy(settings.apSsid, apSsid);
@@ -261,9 +253,27 @@ const uint32_t rssiSendInterval = 3000 * 1000;
 // #endif
 
 void loop() {
+  // If WiFi is down, try reconnecting every reconnectInterval.
+  if (WiFi.status() != WL_CONNECTED) {
+    unsigned long currentMillis = millis();
+
+    if (currentMillis - previousReconnectMillis >= reconnectInterval) {
+      Serial.println("Reconnecting to WiFi...");
+      isWifiConnected = false;
+      WiFi.disconnect();
+      WiFi.reconnect();
+      previousReconnectMillis = currentMillis;
+    }
+  } else if (!isWifiConnected) {
+    Serial.println("Wifi is connected.");
+    isWifiConnected = true;
+    printWifiInfo();
+  }
+
   // If no client has connected, no need to loop.
-  if (!state.clientConnected)
+  if (!state.clientConnected) {
     return;
+  }
 
   if (state.newVtxFreq != settings.vtxFreq) {
     setRxModule(state.newVtxFreq);

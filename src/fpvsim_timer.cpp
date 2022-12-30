@@ -128,8 +128,7 @@ void setupServer() {
 
     request->send(200, "text/json", settingsToJson().c_str());
 
-    // Restart the server.
-    ESP.restart();
+    shutdownMillis = millis();
   });
 
 
@@ -253,11 +252,18 @@ const uint32_t rssiSendInterval = 3000 * 1000;
 // #endif
 
 void loop() {
+  // Shutdown after 1s.
+  if (shutdownMillis != 0 && millis() - shutdownMillis > 1000) {
+    // Restart the server.
+    ESP.restart();
+  }
+
   // If WiFi is down, try reconnecting every reconnectInterval.
   if (WiFi.status() != WL_CONNECTED) {
     unsigned long currentMillis = millis();
 
-    if (currentMillis - previousReconnectMillis >= reconnectInterval) {
+    if (currentMillis - previousReconnectMillis >= reconnectInterval
+        && strlen(settings.routerSsid) > 0) {
       Serial.println("Reconnecting to WiFi...");
       isWifiConnected = false;
       WiFi.disconnect();

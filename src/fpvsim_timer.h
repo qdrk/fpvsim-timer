@@ -13,6 +13,9 @@
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
 
+// Time set to shutdown.
+unsigned long shutdownMillis = 0;
+
 // Reconnect timestamp millis.
 unsigned long previousReconnectMillis = 0;
 // Reconnection interval.

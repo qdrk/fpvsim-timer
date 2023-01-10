@@ -47,8 +47,8 @@ struct SettingsType {
 
   // The RSSI when quad is close.
   uint16_t volatile rssiPeak = 270;
-  uint16_t volatile enterRssiOffset = 5;
-  uint16_t volatile leaveRssiOffset = 20;
+  uint16_t volatile enterRssiOffset = 6;
+  uint16_t volatile leaveRssiOffset = 27;
 
   // Id of the timer, 0 - 25.
   uint8_t volatile id = -1;

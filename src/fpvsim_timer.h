@@ -36,7 +36,7 @@ uint16_t CALIBRATION_LEAVE_RSSI_FACTOR = 2;
 // Maximum passes for calibration to be considered done.
 uint8_t CALIBRATION_PASSES = 1;
 // Calibration has to last at least 60 seconds.
-uint32_t CALIBRATION_MIN_TIME_MICROS = 20 * 1000 * 1000;
+uint32_t CALIBRATION_MIN_TIME_MICROS = 30 * 1000 * 1000;
 // Each lap has to take at least 4 seconds.
 uint32_t MIN_LAP_TIME_MICROS = 4 * 1000 * 1000;
 

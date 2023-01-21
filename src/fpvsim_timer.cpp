@@ -264,16 +264,22 @@ void loop() {
 
     if (currentMillis - previousReconnectMillis >= reconnectInterval
         && strlen(settings.routerSsid) > 0) {
+#ifdef DEV_MODE
       Serial.println("Reconnecting to WiFi...");
+#endif
       isWifiConnected = false;
       WiFi.disconnect();
       WiFi.reconnect();
       previousReconnectMillis = currentMillis;
     }
   } else if (!isWifiConnected) {
-    Serial.println("Wifi is connected.");
     isWifiConnected = true;
+    strcpy(settings.localIp, WiFi.localIP().toString().c_str());
+
+#ifdef DEV_MODE
+    Serial.println("Wifi is connected.");
     printWifiInfo();
+#endif
   }
 
   // If no client has connected, no need to loop.

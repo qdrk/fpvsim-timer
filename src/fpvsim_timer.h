@@ -12,6 +12,7 @@
 #include <SPI.h>
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
+#include <Int64String.h>
 
 // Time set to shutdown.
 unsigned long shutdownMillis = 0;
@@ -83,11 +84,10 @@ struct {
   // The peak smoothed rssi seen the current pass
   uint16_t volatile rssiPeak = 0;
   // The time of the peak raw rssi for the current pass
-  uint32_t volatile rssiPeakRawTimeStamp = 0;
+  uint64_t volatile rssiPeakRawTimeStamp = 0;
 
   // variables to track the loop time
-  uint32_t volatile loopTime = 0;
-  uint32_t volatile lastLoopTimeStamp = 0;
+  uint64_t volatile lastLoopTimeStamp = 0;
 
   // The float version of settings.filterRatio.
   float volatile filterRatioFloat = 0.0f;
@@ -110,7 +110,7 @@ struct {
 struct {
   uint16_t volatile rssiPeakRaw;
   uint16_t volatile rssiPeak;
-  uint32_t volatile timeStamp;
+  uint64_t volatile timeStamp;
   uint8_t volatile lap;
 } lastPass;
 

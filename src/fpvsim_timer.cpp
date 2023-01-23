@@ -13,7 +13,7 @@ void commitEeprom() {
 }
 
 volatile bool settingsUpdated = false;
-volatile uint32_t lastSettingsUpdateTime = 0;
+volatile uint64_t lastSettingsUpdateTime = 0;
 
 void updateRssiTrigger() {
   state.enterRssiTrigger =
@@ -243,7 +243,7 @@ void setup() {
   setupServer();
 }
 
-uint32_t lastRssiSendTime = 0;
+uint64_t lastRssiSendTime = 0;
 // #if defined(ESP8266)
 const uint32_t rssiSendInterval = 3000 * 1000;
 // #else
@@ -293,10 +293,7 @@ void loop() {
     commitEeprom();
   }
 
-  // Calculate the time it takes to run the main loop
-  uint32_t previousLoopTimestamp = state.lastLoopTimeStamp;
   state.lastLoopTimeStamp = micros();
-  state.loopTime = state.lastLoopTimeStamp - previousLoopTimestamp;
 
   // Two settings update has to be larger than 1s interval.
   if (settingsUpdated &&
@@ -321,7 +318,7 @@ void loop() {
   // Measure end.
 
   if (state.lastLoopTimeStamp - lastRssiSendTime > rssiSendInterval) {
-    String rssiMsg = String(state.rssi) + " " + String(state.lastLoopTimeStamp);
+    String rssiMsg = String(state.rssi) + " " + int64String(state.lastLoopTimeStamp);
     // + " " + String(settings.rssiPeak)
     // + " " + String(settings.enterRssiOffset)
     // + " " + String(settings.leaveRssiOffset);
@@ -376,7 +373,7 @@ void loop() {
 
     // See if we have left the gate.
     if (state.rssi < leaveRssiTrigger) {
-      uint32_t lastPassTimestamp = lastPass.timeStamp;
+      uint64_t lastPassTimestamp = lastPass.timeStamp;
 
       lastPass.rssiPeakRaw = state.rssiPeakRaw;
       lastPass.rssiPeak = state.rssiPeak;
@@ -384,12 +381,12 @@ void loop() {
       lastPass.lap = lastPass.lap + 1;
 
       String msg = String(lastPass.lap) + " " +
-                   String(lastPass.timeStamp - lastPassTimestamp) + " " +
+                   int64String(lastPass.timeStamp - lastPassTimestamp) + " " +
                    String(lastPass.rssiPeak)
                    // The peak timestamp will be the initial timestamp of next
                    // timing round.
-                   + " " + String(lastPass.timeStamp) + " " +
-                   String(state.lastLoopTimeStamp);
+                   + " " + int64String(lastPass.timeStamp) + " " +
+                   int64String(state.lastLoopTimeStamp);
 
       Serial.printf_P("Crossing = False >>>>>> %s\n", msg.c_str());
       events.send(msg.c_str(), "newtime", state.lastLoopTimeStamp);

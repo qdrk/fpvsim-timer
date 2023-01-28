@@ -8,7 +8,7 @@
 #define RSSI_PIN 34
 #endif
 
-
+#include <sstream>
 #include <SPI.h>
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>

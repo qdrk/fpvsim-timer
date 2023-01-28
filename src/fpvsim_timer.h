@@ -44,7 +44,8 @@ uint32_t MIN_LAP_TIME_MICROS = 4 * 1000 * 1000;
 struct SettingsType {
   uint16_t volatile vtxFreq = 5732;
 
-  uint8_t volatile filterRatio = 10;
+  // 3ms, 1000hz sampling rate.
+  uint8_t volatile filterRatio = 300;
 
   // The RSSI when quad is close.
   uint16_t volatile rssiPeak = 270;
@@ -87,6 +88,7 @@ struct {
   uint64_t volatile rssiPeakRawTimeStamp = 0;
 
   // variables to track the loop time
+  uint32_t volatile loopTime = 0;
   uint64_t volatile lastLoopTimeStamp = 0;
 
   // The float version of settings.filterRatio.

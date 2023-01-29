@@ -245,7 +245,7 @@ void setup() {
 
 uint64_t lastRssiSendTime = 0;
 // #if defined(ESP8266)
-const uint32_t rssiSendInterval = 3000 * 1000;
+const uint32_t rssiSendInterval = 1000 * 1000;
 // #else
 // // 500ms per rssi.
 // const uint32_t rssiSendInterval = 3000 * 1000;
@@ -293,7 +293,9 @@ void loop() {
     commitEeprom();
   }
 
+  uint32_t previousLoopTimestamp = state.lastLoopTimeStamp;
   state.lastLoopTimeStamp = micros();
+  state.loopTime = state.lastLoopTimeStamp - previousLoopTimestamp;
 
   // Two settings update has to be larger than 1s interval.
   if (settingsUpdated &&
@@ -325,6 +327,8 @@ void loop() {
 #ifdef DEV_MODE
     Serial.print("RSSI:");
     Serial.println(rssiMsg);
+    Serial.print("Loop time micros: ");
+    Serial.println(state.loopTime);
 #endif
     events.send(rssiMsg.c_str(), "rssi", state.lastLoopTimeStamp);
 

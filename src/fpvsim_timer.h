@@ -63,6 +63,8 @@ struct SettingsType {
   // The router ssid and password.
   char routerSsid[32];
   char routerPwd[32];
+
+  uint8_t version = 42;
 } settings;
 
 struct {

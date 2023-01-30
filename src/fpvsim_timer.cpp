@@ -384,12 +384,19 @@ void loop() {
       lastPass.timeStamp = state.rssiPeakRawTimeStamp;
       lastPass.lap = lastPass.lap + 1;
 
+      uint64_t interval = lastPass.timeStamp - lastPassTimestamp;
+
+      // In case some weird overflow happens.
+      if (lastPass.timeStamp < lastPassTimestamp) {
+        interval = 0;
+      }
+
       String msg = String(lastPass.lap) + " " +
-                   int64String(lastPass.timeStamp - lastPassTimestamp) + " " +
-                   String(lastPass.rssiPeak)
+                   int64String(interval) + " " +
+                   String(lastPass.rssiPeak) + " " +
                    // The peak timestamp will be the initial timestamp of next
                    // timing round.
-                   + " " + int64String(lastPass.timeStamp) + " " +
+                   int64String(lastPass.timeStamp) + " " +
                    int64String(state.lastLoopTimeStamp);
 
       Serial.printf_P("Crossing = False >>>>>> %s\n", msg.c_str());

@@ -245,7 +245,7 @@ void setup() {
 
 uint64_t lastRssiSendTime = 0;
 // #if defined(ESP8266)
-const uint32_t rssiSendInterval = 1000 * 1000;
+const uint32_t rssiSendInterval = 2000 * 1000;
 // #else
 // // 500ms per rssi.
 // const uint32_t rssiSendInterval = 3000 * 1000;

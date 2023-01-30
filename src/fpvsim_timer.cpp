@@ -198,7 +198,7 @@ void setup() {
   EEPROM.get(0, settingsPref);
 
   // A heuristics to check EEPROM has been set, since this var is never changed.
-  if (settingsPref.filterRatio == 10) {
+  if (settingsPref.filterRatio == INITIAL_RSSI_FILTER) {
     Serial.println("Loading from EEPROM.");
     settings = settingsPref;
     // So we don't accidentally reset the vtx freq.

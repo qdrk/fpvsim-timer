@@ -32,6 +32,8 @@ const int spiClockPin = SCK;
 
 // #define DEV_MODE
 
+uint8_t INITIAL_RSSI_FILTER = 30;
+
 // Leave offset will multiply this factor when in calibration mode.
 uint16_t CALIBRATION_LEAVE_RSSI_FACTOR = 2;
 // Maximum passes for calibration to be considered done.
@@ -44,8 +46,7 @@ uint32_t MIN_LAP_TIME_MICROS = 4 * 1000 * 1000;
 struct SettingsType {
   uint16_t volatile vtxFreq = 5732;
 
-  // 3ms, 1000hz sampling rate.
-  uint8_t volatile filterRatio = 300;
+  uint8_t volatile filterRatio = INITIAL_RSSI_FILTER;
 
   // The RSSI when quad is close.
   uint16_t volatile rssiPeak = 270;

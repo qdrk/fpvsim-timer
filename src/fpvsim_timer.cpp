@@ -224,6 +224,15 @@ void setup() {
 
     Serial.print("Rssi peak: ");
     Serial.println(settings.rssiPeak);
+
+    Serial.print("filterRatio: ");
+    Serial.println(settings.filterRatio);
+
+    Serial.print("Router SSID: ");
+    Serial.println(settings.routerSsid);
+
+    Serial.print("Router pwd: ");
+    Serial.println(settings.routerPwd);
   } else {
     Serial.println("EEPROM not set.");
   }
@@ -254,14 +263,6 @@ void setup() {
 
   setupServer();
 }
-
-uint64_t lastRssiSendTime = 0;
-// #if defined(ESP8266)
-const uint32_t rssiSendInterval = 2000 * 1000;
-// #else
-// // 500ms per rssi.
-// const uint32_t rssiSendInterval = 3000 * 1000;
-// #endif
 
 void loop() {
   // Shutdown after 1s.
@@ -331,11 +332,21 @@ void loop() {
   }
   // Measure end.
 
+
+  // START: RSSI logging and monitoring.
+  if (settings.logRssi && state.lastLoopTimeStamp - lastRssiLogTime > rssiLogInterval) {
+    state.rssiLogStream << state.rssi << " ";
+    lastRssiLogTime = state.lastLoopTimeStamp;
+  }
+
   if (state.lastLoopTimeStamp - lastRssiSendTime > rssiSendInterval) {
-    String rssiMsg = String(state.rssi) + " " + int64String(state.lastLoopTimeStamp);
-    // + " " + String(settings.rssiPeak)
-    // + " " + String(settings.enterRssiOffset)
-    // + " " + String(settings.leaveRssiOffset);
+    String rssiMsg =
+      String(state.rssi) + " " + int64String(state.lastLoopTimeStamp) + " "
+        + String(state.rssiLogStream.str().c_str());
+
+    // Reset the rssi log stream.
+    state.rssiLogStream = std::stringstream();
+
 #ifdef DEV_MODE
     Serial.print("RSSI:");
     Serial.println(rssiMsg);
@@ -346,6 +357,8 @@ void loop() {
 
     lastRssiSendTime = state.lastLoopTimeStamp;
   }
+  // END
+
 
   if (!state.crossing &&
       state.rssi > state.enterRssiTrigger

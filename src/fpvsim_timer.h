@@ -13,7 +13,6 @@
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
 #include <Int64String.h>
-#include <vector>
 
 // Time set to shutdown.
 unsigned long shutdownMillis = 0;
@@ -44,6 +43,12 @@ uint32_t CALIBRATION_MIN_TIME_MICROS = 30 * 1000 * 1000;
 // Each lap has to take at least 4 seconds.
 uint32_t MIN_LAP_TIME_MICROS = 4 * 1000 * 1000;
 
+uint64_t lastRssiSendTime = 0;
+const uint32_t rssiSendInterval = 2000 * 1000; // 2000ms.
+
+uint64_t lastRssiLogTime = 0;
+const uint32_t rssiLogInterval = 50 * 1000; // 50ms.
+
 struct SettingsType {
   uint16_t volatile vtxFreq = 5732;
 
@@ -54,7 +59,7 @@ struct SettingsType {
   uint16_t volatile enterRssiOffset = 6;
   uint16_t volatile leaveRssiOffset = 27;
   // When true, logs the rssi from last rssi update.
-  bool volatile logRssi = false;
+  bool volatile logRssi = true;
 
   // Id of the timer, 0 - 25.
   uint8_t volatile id = -1;
@@ -113,6 +118,9 @@ struct {
 
   // Whether a client has connected.
   bool volatile clientConnected = false;
+
+  // RSSI log.
+  std::stringstream rssiLogStream;
 } state;
 
 struct {
@@ -127,9 +135,14 @@ std::string settingsToJson() {
   ss << "{" << std::endl;
 
   ss << "\"vtxFreq\":" << settings.vtxFreq << "," << std::endl;
+
   ss << "\"rssiPeak\":" << settings.rssiPeak << "," << std::endl;
   ss << "\"enterRssiOffset\":" << settings.enterRssiOffset << "," << std::endl;
   ss << "\"leaveRssiOffset\":" << settings.leaveRssiOffset << "," << std::endl;
+  // Convert to int so it won't be treated as ASCII code.
+  ss << "\"filterRatio\":" << (int) settings.filterRatio << "," << std::endl;
+  ss << "\"logRssi\":" << (settings.logRssi ? "true" : "false") << "," << std::endl;
+
   ss << "\"apSsid\":\"" << settings.apSsid << "\"," << std::endl;
   ss << "\"apIp\":\"" << settings.apIp << "\"," << std::endl;
   ss << "\"localIp\":\"" << settings.localIp << "\"," << std::endl;

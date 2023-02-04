@@ -13,6 +13,7 @@
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
 #include <Int64String.h>
+#include <vector>
 
 // Time set to shutdown.
 unsigned long shutdownMillis = 0;
@@ -30,7 +31,7 @@ const int slaveSelectPin = SS; // Setup data pins for rx5808 comms
 const int spiDataPin = MOSI;
 const int spiClockPin = SCK;
 
-// #define DEV_MODE
+#define DEV_MODE
 
 uint8_t INITIAL_RSSI_FILTER = 30;
 
@@ -52,6 +53,8 @@ struct SettingsType {
   uint16_t volatile rssiPeak = 270;
   uint16_t volatile enterRssiOffset = 6;
   uint16_t volatile leaveRssiOffset = 27;
+  // When true, logs the rssi from last rssi update.
+  bool volatile logRssi = false;
 
   // Id of the timer, 0 - 25.
   uint8_t volatile id = -1;

@@ -20,11 +20,12 @@ void updateRssiTrigger() {
       settings.rssiPeak * (1.0 - settings.enterRssiOffset / 100.0);
   state.leaveRssiTrigger =
       settings.rssiPeak * (1.0 - settings.leaveRssiOffset / 100.0);
+  state.filterRatioFloat = settings.filterRatio / 1000.0f;
 
 #ifdef DEV_MODE
   // NOTE: have to use %d instead of %s here to avoid crashing.
-  Serial.printf_P("peak: %d, enter: %d, leave: %d \n", settings.rssiPeak,
-                  state.enterRssiTrigger, state.leaveRssiTrigger);
+  Serial.printf_P("peak: %d, enter: %d, leave: %d, filter: %d \n", settings.rssiPeak,
+                  state.enterRssiTrigger, state.leaveRssiTrigger, settings.filterRatio);
 #endif
 
   settingsUpdated = true;
@@ -101,6 +102,18 @@ void setupServer() {
         std::atoi(request->getParam("enterRssiOffset")->value().c_str());
     settings.leaveRssiOffset =
         std::atoi(request->getParam("leaveRssiOffset")->value().c_str());
+
+    // Update filter ratio if in the request, compatible with older client.
+    if (request->hasParam("filterRatio")) {
+      settings.filterRatio =
+          std::atoi(request->getParam("filterRatio")->value().c_str());
+    }
+
+    // Update logRssi if in the request, compatible with older client.
+    if (request->hasParam("logRssi")) {
+      settings.logRssi =
+          strcmp(request->getParam("filterRatio")->value().c_str(), "true") == 0;
+    }
 
     updateRssiTrigger();
     commitEeprom();
@@ -236,9 +249,6 @@ void setup() {
   while (!Serial) {
   }; // Wait for the Serial port to initialise
   Serial.println("Serial ready...");
-
-  // Initialize lastPass defaults
-  state.filterRatioFloat = settings.filterRatio / 1000.0f;
 
   setRxModule(settings.vtxFreq);
 

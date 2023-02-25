@@ -14,6 +14,9 @@
 #include <ESPAsyncWebServer.h>
 #include <Int64String.h>
 
+// Incompatible with 2.1 or earlier version of the client software.
+#define FW_VERSION "2.2.0"
+
 // Time set to shutdown.
 unsigned long shutdownMillis = 0;
 
@@ -23,8 +26,6 @@ unsigned long previousReconnectMillis = 0;
 unsigned long reconnectInterval = 1000 * 5;
 // Used to bookkeep whether connected to router.
 bool isWifiConnected = false;
-// SSID for AP mode.
-char apSsid[11];
 
 const int slaveSelectPin = SS; // Setup data pins for rx5808 comms
 const int spiDataPin = MOSI;
@@ -66,13 +67,16 @@ struct SettingsType {
 
   char apIp[20];
   char localIp[20];
-  char apSsid[30];
+  char apSsid[30] = {0};
 
   // The router ssid and password.
   char routerSsid[32];
   char routerPwd[32];
 
   uint8_t version = 42;
+
+  // AP ssid and password.
+  char apPwd[30] = {0};
 } settings;
 
 struct {
@@ -144,11 +148,14 @@ std::string settingsToJson() {
   ss << "\"logRssi\":" << (settings.logRssi ? "true" : "false") << "," << std::endl;
 
   ss << "\"apSsid\":\"" << settings.apSsid << "\"," << std::endl;
+  ss << "\"apPwd\":\"" << settings.apPwd << "\"," << std::endl;
   ss << "\"apIp\":\"" << settings.apIp << "\"," << std::endl;
-  ss << "\"localIp\":\"" << settings.localIp << "\"," << std::endl;
 
+  ss << "\"localIp\":\"" << settings.localIp << "\"," << std::endl;
   ss << "\"routerSsid\":\"" << settings.routerSsid << "\"," << std::endl;
-  ss << "\"routerPwd\":\"" << settings.routerPwd << "\"" << std::endl;
+  ss << "\"routerPwd\":\"" << settings.routerPwd << "\"," << std::endl;
+
+  ss << "\"version\":\"" << FW_VERSION << "\"" << std::endl;
 
   ss << "}";
 
@@ -270,8 +277,10 @@ void printWifiInfo() {
   Serial.print(" : ");
   Serial.println(WiFi.localIP());
   Serial.print("IP address for network ");
-  Serial.print(apSsid);
+  Serial.print(settings.apSsid);
   Serial.print(" : ");
   Serial.print(WiFi.softAPIP());
   Serial.println("");
+  Serial.print("Password: ");
+  Serial.println(settings.apPwd);
 }

@@ -31,17 +31,29 @@ void updateRssiTrigger() {
   settingsUpdated = true;
 }
 
-void setApSsid() {
-  strcpy(apSsid, "fpvsim- \0");
-  apSsid[7] = char('a' + settings.id);
+void initApSsidIfNeeded() {
+  // If already inited, just return.
+  if (strlen(settings.apSsid) > 0) {
+    return;
+  }
+
+  strcpy(settings.apSsid, "fpvsim- \0");
+  settings.apSsid[7] = char('a' + settings.id); 
+  settings.apPwd[0] = 0;
+
+  commitEeprom();
 }
 
 void setupServer() {
-  setApSsid();
+  initApSsidIfNeeded();
 
   // Begin Access Point
   WiFi.mode(WIFI_AP_STA);
-  WiFi.softAP(apSsid);
+  if (strlen(settings.apPwd) > 0) {
+    WiFi.softAP(settings.apSsid, settings.apPwd);
+  } else {
+    WiFi.softAP(settings.apSsid);
+  }
 
   // Begin WiFi
   if (strlen(settings.routerSsid) > 0) {
@@ -72,7 +84,6 @@ void setupServer() {
   printWifiInfo();
 
   // Dump network settings.
-  strcpy(settings.apSsid, apSsid);
   strcpy(settings.localIp, WiFi.localIP().toString().c_str());
   strcpy(settings.apIp, WiFi.softAPIP().toString().c_str());
 
@@ -126,13 +137,18 @@ void setupServer() {
 
   server.on("/api/v1/wifisettings", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (!request->hasParam("routerSsid") ||
-        !request->hasParam("routerPwd")) {
+        !request->hasParam("routerPwd") ||
+        !request->hasParam("apSsid") ||
+        !request->hasParam("apPwd")) {
       request->send(400, "text/plain", "Invalid params");
       return;
     }
 
+    // TODO: handle over-length.
     strcpy(settings.routerSsid, request->getParam("routerSsid")->value().c_str());
     strcpy(settings.routerPwd, request->getParam("routerPwd")->value().c_str());
+    strcpy(settings.apSsid, request->getParam("apSsid")->value().c_str());
+    strcpy(settings.apPwd, request->getParam("apPwd")->value().c_str());
 
     commitEeprom();
 

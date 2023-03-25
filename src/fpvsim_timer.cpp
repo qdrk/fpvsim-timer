@@ -123,7 +123,7 @@ void setupServer() {
     // Update logRssi if in the request, compatible with older client.
     if (request->hasParam("logRssi")) {
       settings.logRssi =
-          strcmp(request->getParam("filterRatio")->value().c_str(), "true") == 0;
+          strcmp(request->getParam("logRssi")->value().c_str(), "true") == 0;
     }
 
     updateRssiTrigger();

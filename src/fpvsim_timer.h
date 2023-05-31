@@ -35,8 +35,8 @@ unsigned long reconnectInterval = 1000 * 5;
 bool isWifiConnected = false;
 
 // Setup data pins for rx5808 comms
-const int slaveSelectPin = SS; // CH2
 const int spiDataPin = MOSI;   // CH1
+const int slaveSelectPin = SS; // CH2
 const int spiClockPin = SCK;   // CH3
 
 #define DEV_MODE

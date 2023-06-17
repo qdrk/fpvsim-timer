@@ -1,10 +1,17 @@
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
-
 #define RSSI_PIN A0
+
+#elif defined(ESP32C3)
+#include "WiFi.h"
+#define RSSI_PIN 3
+
+#elif defined(ESP32S3)
+#include "WiFi.h"
+#define RSSI_PIN 13
+
 #else
 #include "WiFi.h"
-
 #define RSSI_PIN 34
 #endif
 
@@ -27,9 +34,10 @@ unsigned long reconnectInterval = 1000 * 5;
 // Used to bookkeep whether connected to router.
 bool isWifiConnected = false;
 
-const int slaveSelectPin = SS; // Setup data pins for rx5808 comms
-const int spiDataPin = MOSI;
-const int spiClockPin = SCK;
+// Setup data pins for rx5808 comms
+const int spiDataPin = MOSI;   // CH1
+const int slaveSelectPin = SS; // CH2
+const int spiClockPin = SCK;   // CH3
 
 #define DEV_MODE
 

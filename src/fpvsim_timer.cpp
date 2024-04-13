@@ -373,7 +373,7 @@ void loop() {
 
     lastRssiSendTime = state.lastLoopTimeStamp;
   }
-  // END
+  // END: RSSI logging and monitoring.
 
 
   if (!state.crossing &&

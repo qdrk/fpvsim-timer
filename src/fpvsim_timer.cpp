@@ -204,6 +204,9 @@ void setupServer() {
   });
   server.addHandler(&events);
 
+  // Inject ElegantOTA routes and logic into the web server.
+  AsyncElegantOTA.begin(&server);
+
   server.begin();
 
   Serial.println("HTTP server started");
@@ -281,6 +284,9 @@ void setup() {
 }
 
 void loop() {
+  // // Necessary for ElegantOTA to handle reboot after OTA update.
+  // AsyncElegantOTA.loop();
+  
   // Shutdown after 1s.
   if (shutdownMillis != 0 && millis() - shutdownMillis > 1000) {
     // Restart the server.

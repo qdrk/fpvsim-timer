@@ -20,6 +20,7 @@
 #include <EEPROM.h>
 #include <ESPAsyncWebServer.h>
 #include <Int64String.h>
+#include <AsyncElegantOTA.h>
 
 // Incompatible with 2.1 or earlier version of the client software.
 #define FW_VERSION "2.2.0"

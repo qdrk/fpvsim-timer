@@ -23,7 +23,7 @@
 #include <AsyncElegantOTA.h>
 
 // Incompatible with 2.1 or earlier version of the client software.
-#define FW_VERSION "2.2.0"
+#define FW_VERSION "2.3.0"
 
 // Time set to shutdown.
 unsigned long shutdownMillis = 0;
